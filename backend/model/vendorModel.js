@@ -2,37 +2,39 @@ import mongoose from "mongoose";
 
 const vendorSchema = new mongoose.Schema(
   {
-    userId: {
+    owner_user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: true
     },
 
-    shopName: { type: String, required: true },
-
-    shopLogo: { type: String },
-
-    gstNumber: { type: String },
-
-    pickupAddress: {
-      street: String,
-      city: String,
-      state: String,
-      pincode: String,
-    },
-
-    bankDetails: {
-      accountHolderName: String,
-      accountNumber: String,
-      ifscCode: String,
-      bankName: String,
-    },
-
-    vendorStatus: {
+    name: {
       type: String,
-      enum: ["pending", "approved", "rejected"],
-      default: "pending",
+      required: true,
+      maxlength: 255,
+      trim: true
     },
+
+    description: {
+      type: String,
+      default: null
+    },
+
+    type: {
+      type: String,
+      enum: ["restaurant", "grocery", "mixed"],
+      required: true
+    },
+
+    logo_url: {
+      type: [String],
+      default: []
+    },
+
+    is_active: {
+      type: Boolean,
+      default: true
+    }
   },
   { timestamps: true }
 );

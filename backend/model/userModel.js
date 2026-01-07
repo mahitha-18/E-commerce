@@ -10,19 +10,16 @@ const userSchema = new mongoose.Schema(
     },
 
     admin_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: String,
       default: null,
       required: false
     },
 
     subAdmin_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: String,
       default: null,
       required: false
     },
-
     name: {
       type: String,
       required: true,
@@ -38,25 +35,26 @@ const userSchema = new mongoose.Schema(
 
     phone_number: {
       type: String,
-      required: true
+      required: true,
+      unique: true,
     },
 
     otp: {
       type: String,
-      default: null
+      default: null,
     },
 
-    otp_expires_at: {
-  type: Date,
-  default: null
-},
     password: {
       type: String,
       required: true
     },
 
     image: {
-      type: String, // URL path of image stored locally or in S3
+      type: String,
+      default: null
+    },
+    Resume: {
+      type: String,
       default: null
     },
 
@@ -74,13 +72,5 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-// Hash password before save
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
 
 export default mongoose.model("User", userSchema);

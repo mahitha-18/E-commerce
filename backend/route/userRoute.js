@@ -1,42 +1,62 @@
-// // routes/userRoutes.js
 // import express from "express";
-// import {
-//   register,
-//   login,
-//   logout,
-//   getAllUsers,
-//   getUser,
-//   updateUserController,
-//   deleteUserController,
-// } from "../controller/userController.js";
-// import { protect, adminOnly } from "../middleware/authMiddleware.js";
+// import UserController from "../controller/userController.js";
+// import upload from "../middleware/upload.js";
 
 // const router = express.Router();
 
-// /* Public */
-// router.post("/register", register);
-// router.post("/login", login);
-// router.post("/logout", logout);
-
-// /* Protected Routes */
-// router.get("/getall", protect, adminOnly, getAllUsers);
-// router.get("/getbyid/:id", protect, adminOnly, getUser);
-// router.put("/update/:id", protect, adminOnly, updateUserController);
-// router.delete("/delete/:id", protect, adminOnly, deleteUserController);
-
-// export default router;
+// export default router.post(
+//   "/create",
+//   (req, res, next) => {
+//     upload.fields([
+//       { name: "image", maxCount: 1 },
+//       { name: "Resume", maxCount: 1 },
+//     ])(req, res, (err) => {
+//       if (err) return res.status(400).json({ message: err.message });
+//       next();
+//     });
+//   },
+//   UserController.registerUser
+// );
 
 import express from "express";
 import UserController from "../controller/userController.js";
+import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
-router.post("/create", UserController.create);
-router.post("/login", UserController.login);
-
+// ------------------------------
+// REGISTER USER
+// ------------------------------
+router.post(
+  "/create",
+  (req, res, next) => {
+    upload.fields([
+      { name: "image", maxCount: 1 },
+      { name: "Resume", maxCount: 1 },
+    ])(req, res, (err) => {
+      if (err) return res.status(400).json({ message: err.message });
+      next();
+    });
+  },
+  UserController.registerUser
+);
 router.get("/getall", UserController.getAll);
 router.get("/getby/:id", UserController.getById);
 router.put("/update/:id", UserController.update);
 router.delete("/delete/:id", UserController.delete);
+// ------------------------------
+// VERIFY OTP
+// ------------------------------
+router.post("/verify-otp", UserController.verifyOtp);
+// router.post("/otp/generate", UserController.generateOtp);
+
+router.put("/change-password/:id", UserController.changePassword);
+router.post("/login", UserController.login);
+router.post("/forgot-password", UserController.forgotPassword);
+router.post("/reset-password", UserController.resetPassword);
+router.get("/getbyrole/:roleId", UserController.getUsersByRole);
+
+
+router.post("/resend-otp", UserController.resendOtp);
 
 export default router;

@@ -1,50 +1,126 @@
 import mongoose from "mongoose";
 
-const orderSchema = new mongoose.Schema(
+const { Schema, model } = mongoose;
+
+const orderSchema = new Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+    order_number: {
+      type: String,
+      required: true,
+      unique: true,
+      // index: true,
+    },
+
+    user_id: {
+      type: Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+      // index: true,
+    },
+
+    vendor_outlet_id: {
+      type: Schema.Types.ObjectId,
+      ref: "vendor_outlets",
+      required: true,
+      // index: true,
+    },
+
+    delivery_address_id: {
+      type: Schema.Types.ObjectId,
+      ref: "addresses",
       required: true,
     },
 
-    products: [
-      {
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-        },
-        vendorId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Vendor",
-        },
-        quantity: Number,
-        price: Number,
-      },
-    ],
-
-    totalAmount: { type: Number, required: true },
-
-    paymentStatus: {
+    status: {
       type: String,
-      enum: ["pending", "paid", "failed"],
+      enum: [
+        "pending",
+        "accepted",
+        "preparing",
+        "out_for_delivery",
+        "delivered",
+        "cancelled",
+      ],
+      default: "pending",
+      // index: true,
+    },
+
+    subtotal_amount: {
+      type: Number,
+      required: true,
+    },
+
+    delivery_fee: {
+      type: Number,
+      default: 0,
+    },
+
+    tax_amount: {
+      type: Number,
+      default: 0,
+    },
+
+    discount_amount: {
+      type: Number,
+      default: 0,
+    },
+
+    total_amount: {
+      type: Number,
+      required: true,
+    },
+
+    payment_status: {
+      type: String,
+      enum: ["pending", "paid", "failed", "refunded"],
       default: "pending",
     },
 
-    orderStatus: {
-      type: String,
-      enum: ["pending", "packed", "shipped", "delivered", "cancelled"],
-      default: "pending",
+    coupon_id: {
+      type: Schema.Types.ObjectId,
+      ref: "coupons",
+      default: null,
     },
 
-    shippingAddress: {
-      street: String,
-      city: String,
-      state: String,
-      pincode: String,
+    placed_at: {
+      type: Date,
+      default: Date.now,
+    },
+
+    expected_delivery_at: {
+      type: Date,
+      default: null,
+    },
+
+    delivered_at: {
+      type: Date,
+      default: null,
+    },
+
+    cancelled_at: {
+      type: Date,
+      default: null,
+    },
+
+    cancel_reason: {
+      type: String,
+      default: null,
+    },
+
+    metadata: {
+      type: Schema.Types.Mixed,
+      default: null,
     },
   },
-  { timestamps: true }
+  {
+    collection: "orders",
+    timestamps: true,
+  }
 );
 
-export default mongoose.model("Order", orderSchema);
+// Indexes
+// orderSchema.index({ user_id: 1 });
+orderSchema.index({ vendor_outlet_id: 1 });
+orderSchema.index({ status: 1 });
+
+export default model("orders", orderSchema);

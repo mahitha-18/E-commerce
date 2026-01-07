@@ -2,17 +2,25 @@ import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-
-    slug: { type: String, required: true, unique: true },
-
-    parentCategory: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      default: null,
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
     },
-
-    image: { type: String },
+    description: {
+      type: String,
+      default: null,
+      trim: true,
+    },
+    is_active: {
+      type: Boolean,
+      default: true,
+    },
+    image_url: {
+      type: [String], // storing multiple image path URLs
+      default: [],
+    },
   },
   { timestamps: true }
 );
